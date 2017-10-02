@@ -148,7 +148,11 @@ func nodeToMember(n *store.NodeExtern) (*Member, error) {
 			return nil, fmt.Errorf("unmarshal raftAttributes error: %v", err)
 		}
 	} else {
-		return nil, fmt.Errorf("raftAttributes key doesn't exist")
+		// make up some data for the bad member.
+		data := []byte("{\"peerURLs\":[\"https://10.0.0.1:2380\"]}")
+		if err := json.Unmarshal(data, &m.RaftAttributes); err != nil {
+			return nil, fmt.Errorf("unmarshal raftAttributes error: %v", err)
+		}
 	}
 	if data := attrs[attrKey]; data != nil {
 		if err := json.Unmarshal(data, &m.Attributes); err != nil {

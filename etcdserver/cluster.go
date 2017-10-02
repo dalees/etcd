@@ -238,11 +238,11 @@ func (c *cluster) Recover() {
 // ValidateConfigurationChange takes a proposed ConfChange and
 // ensures that it is still valid.
 func (c *cluster) ValidateConfigurationChange(cc raftpb.ConfChange) error {
-	members, removed := membersFromStore(c.store)
+	members, _ := membersFromStore(c.store)
 	id := types.ID(cc.NodeID)
-	if removed[id] {
+	/*if removed[id] {
 		return ErrIDRemoved
-	}
+	}*/
 	switch cc.Type {
 	case raftpb.ConfChangeAddNode:
 		if members[id] != nil {
@@ -322,7 +322,7 @@ func (c *cluster) RemoveMember(id types.ID) {
 	}
 	delete(c.members, id)
 	if _, err := c.store.Create(removedMemberStoreKey(id), false, "", false, store.TTLOptionSet{ExpireTime: store.Permanent}); err != nil {
-		plog.Panicf("create removedMember should never fail: %v", err)
+		plog.Warningf("create removedMember should never fail: %v", err)
 	}
 	c.removed[id] = true
 }
